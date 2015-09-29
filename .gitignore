@@ -1,0 +1,13 @@
+exec/
+*.swp
+CMakeCache.txt
+CMakeFiles
+GPATH
+GRTAGS
+GTAGS
+Makefile
+*.cmake
+*.a
+*.so
+*.o
+
