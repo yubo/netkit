@@ -80,7 +80,7 @@ getopt_long_only (argc, argv, options, long_options, opt_index)
 
 
 #endif	/* _LIBC or not __GNU_LIBRARY__.  */
-
+
 #ifdef TEST
 
 #include <stdio.h>
