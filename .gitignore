@@ -11,3 +11,4 @@ Makefile
 *.so
 *.o
 tmp/
+test.c
