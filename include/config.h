@@ -10,12 +10,6 @@
 /* Define to 1 if you have the `attron' function. */
 #define HAVE_ATTRON 1
 
-/* Define to 1 if you have the <cursesX.h> header file. */
-/* #undef HAVE_CURSESX_H */
-
-/* Define to 1 if you have the <curses.h> header file. */
-/* #define HAVE_CURSES_H 1 */
-
 /* Define to 1 if you have the declaration of `errno', and to 0 if you don't.
    */
 #define HAVE_DECL_ERRNO 1
@@ -127,18 +121,6 @@
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "0.86"
-
-/* The size of `unsigned char', as computed by sizeof. */
-#define SIZEOF_UNSIGNED_CHAR 1
-
-/* The size of `unsigned int', as computed by sizeof. */
-#define SIZEOF_UNSIGNED_INT 4
-
-/* The size of `unsigned long', as computed by sizeof. */
-#define SIZEOF_UNSIGNED_LONG 8
-
-/* The size of `unsigned short', as computed by sizeof. */
-#define SIZEOF_UNSIGNED_SHORT 2
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -330,25 +312,5 @@ int sigwait(const unsigned int *set, int *sig);
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT ""
 
-/* Define to 1 if you have the ANSI C header files. */
-#define STDC_HEADERS 1
-
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #define TIME_WITH_SYS_TIME 1
-
-/* Define to 1 if your processor stores words with the most significant byte
-   first (like Motorola and SPARC, unlike Intel and VAX). */
-/* #undef WORDS_BIGENDIAN */
-
-/* Define to empty if `const' does not conform to ANSI C. */
-/* #undef const */
-
-/* Define as `__inline' if that's what the C compiler calls it, or to nothing
-   if it is not supported. */
-#define inline 
-
-/* Define to `unsigned' if <sys/types.h> does not define. */
-/* #undef size_t */
-
-/* Define to `int' if <sys/types.h> does not define. */
-/* #undef ssize_t */

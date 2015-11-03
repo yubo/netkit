@@ -10,4 +10,4 @@ Makefile
 *.a
 *.so
 *.o
-
+tmp/
