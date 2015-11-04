@@ -25,63 +25,71 @@
 #include <netinet/ip6.h>
 #include <netinet/icmp6.h>
 #endif
+#include <sys/socket.h>
+#include <sys/time.h>
 
-int net_preopen(void);
-int net_selectsocket(void);
-int net_open(struct hostent *host);
-void net_reopen(struct hostent *address);
-int net_set_interfaceaddress (char *InterfaceAddress); 
-void net_reset(void);
-void net_close(void);
-int net_waitfd(void);
-void net_process_return(void);
-void net_harvest_fds(void);
+#include "utils.h"
 
-int net_max(void);
-int net_min(void);
-int net_last(int at);
-ip_t * net_addr(int at);
-void * net_mpls(int at);
-void * net_mplss(int, int);
-int net_loss(int at);
-int net_drop(int at);
-int net_last(int at);
-int net_best(int at);
-int net_worst(int at);
-int net_avg(int at);
-int net_gmean(int at);
-int net_stdev(int at);
-int net_jitter(int at);
-int net_jworst(int at);
-int net_javg(int at);
-int net_jinta(int at);
-ip_t * net_addrs(int at, int i);
-char *net_localaddr(void); 
+struct nettask;
 
-int net_send_batch(void);
-void net_end_transit(void);
+struct nettask *net_init(int fstTTL, int maxTTL,
+		int cpacketsize, int bitpattern, int tos, int af,
+		int mtrtype, int remoteport, int tcp_timeout, int mark);
+int net_preopen(struct nettask *t);
+int net_selectsocket(struct nettask *t);
+int net_open(struct nettask *t, struct hostent *host);
+void net_reopen(struct nettask *t, struct hostent *address);
+int net_set_interfaceaddress (struct nettask *t, char *InterfaceAddress); 
+void net_reset(struct nettask *t);
+void net_close(struct nettask *t);
+int net_waitfd(struct nettask *t);
+void net_process_return(struct nettask *t);
+void net_harvest_fds(struct nettask *t);
 
-int calc_deltatime (float WaitTime);
+int net_max(struct nettask *t);
+int net_min(struct nettask *t);
+ip_t * net_addr(struct nettask *t, int at);
+void * net_mpls(struct nettask *t, int at);
+void * net_mplss(struct nettask *t, int, int);
+int net_loss(struct nettask *t, int at);
+int net_drop(struct nettask *t, int at);
+int net_last(struct nettask *t, int at);
+int net_best(struct nettask *t, int at);
+int net_worst(struct nettask *t, int at);
+int net_avg(struct nettask *t, int at);
+int net_gmean(struct nettask *t, int at);
+int net_stdev(struct nettask *t, int at);
+int net_jitter(struct nettask *t, int at);
+int net_jworst(struct nettask *t, int at);
+int net_javg(struct nettask *t, int at);
+int net_jinta(struct nettask *t, int at);
+ip_t * net_addrs(struct nettask *t, int at, int i);
+char *net_localaddr(struct nettask *t); 
 
-int net_returned(int at);
-int net_xmit(int at);
-int net_transit(int at);
+int net_send_batch(struct nettask *t);
+void net_end_transit(struct nettask *t);
 
-int net_up(int at);
+int calc_deltatime(struct nettask *t, float WaitTime);
 
-#define SAVED_PINGS 200
-int* net_saved_pings(int at);
-void net_save_xmit(int at);
-void net_save_return(int at, int seq, int ms);
-int net_duplicate(int at, int seq);
+int net_returned(struct nettask *t, int at);
+int net_xmit(struct nettask *t, int at);
+int net_transit(struct nettask *t, int at);
 
-void sockaddrtop( struct sockaddr * saddr, char * strptr, size_t len );
+int net_up(struct nettask *t, int at);
+
+int* net_saved_pings(struct nettask *t, int at);
+void net_save_xmit(struct nettask *t, int at);
+void net_save_return(struct nettask *t, int at, int seq, int ms);
+int net_duplicate(struct nettask *t, int at, int seq);
+
+void sockaddrtop(struct sockaddr * saddr, char * strptr, size_t len );
 int addrcmp( char * a, char * b, int af );
 void addrcpy( char * a, char * b, int af );
 
-void net_add_fds(fd_set *writefd, int *maxfd);
-void net_process_fds(fd_set *writefd);
+void net_add_fds(struct nettask *t, fd_set *writefd, int *maxfd);
+void net_process_fds(struct nettask *t, fd_set *writefd);
 
+#define SAVED_PINGS 200
 #define MAXPATH 8
 #define MaxHost 256
 #define MinSequence 33000
@@ -135,3 +143,107 @@ struct mplslen {
 };
 
 void decodempls(int, char *, struct mplslen *, int);
+
+struct nethost {
+	ip_t addr;
+	ip_t addrs[MAXPATH];	/* for multi paths byMin */
+	int xmit;
+	int returned;
+	int sent;
+	int up;
+	long long var;/* variance, could be overflowed */
+	int last;
+	int best;
+	int worst;
+	int avg;	/* average:  addByMin */
+	int gmean;	/* geometirc mean: addByMin */
+	int jitter;	/* current jitter, defined as t1-t0 addByMin */
+	/*int jbest;*/	/* min jitter, of cause it is 0, not needed */
+	int javg;	/* avg jitter */
+	int jworst;	/* max jitter */
+	int jinta;	/* estimated variance,? rfc1889's "Interarrival Jitter" */
+	int transit;
+	int saved[SAVED_PINGS];
+	int saved_seq_offset;
+	struct mplslen mpls;
+	struct mplslen mplss[MAXPATH];
+};
+
+
+struct sequence {
+	int index;
+	int transit;
+	int saved_seq;
+	struct timeval time;
+	int socket;
+};
+
+
+struct nettask {
+	int fstTTL;		/* initial hub(ttl) to ping byMin */
+	int maxTTL;		/* last hub to ping byMin*/
+	int cpacketsize;		/* packet size used by ping */
+	int packetsize;		/* packet size used by ping */
+	int bitpattern;		/* packet bit pattern used by ping */
+	int tos;			/* type of service set in ping packet*/
+	int af;			/* address family of remote target */
+	int mtrtype;		/* type of query packet used */
+	int remoteport;          /* target port for TCP tracing */
+	int tcp_timeout;             /* timeout for TCP connections */
+	int mark;		/* SO_MARK to set for ping packet*/
+	struct nethost host[MaxHost];
+	struct sequence sequence[MaxSequence];
+	struct timeval reset;
+
+	int batch_at;
+	int numhosts;
+
+#ifdef ENABLE_IPV6
+	struct sockaddr_storage sourcesockaddr_struct;
+	struct sockaddr_storage remotesockaddr_struct;
+	struct sockaddr_in6 * ssa6;
+	struct sockaddr_in6 * rsa6;
+#else
+	struct sockaddr_in sourcesockaddr_struct;
+	struct sockaddr_in remotesockaddr_struct;
+#endif
+	
+	struct sockaddr * sourcesockaddr;
+	struct sockaddr * remotesockaddr;
+	struct sockaddr_in * ssa4;
+	struct sockaddr_in * rsa4;
+	
+	ip_t * sourceaddress;
+	ip_t * remoteaddress;
+
+	/* BSD-derived kernels use host byte order for the IP length and 
+	offset fields when using raw sockets.  We detect this automatically at 
+	run-time and do the right thing. */
+	int BSDfix;
+	
+	
+/*	int    timestamp; */
+	int    sendsock4;
+	int    sendsock4_icmp;
+	int    sendsock4_udp;
+	int    recvsock4;
+	int    sendsock6;
+	int    sendsock6_icmp;
+	int    sendsock6_udp;
+	int    recvsock6;
+	int    sendsock;
+	int    recvsock;
+
+	/* XXX How do I code this to be IPV6 compatible??? */
+#ifdef ENABLE_IPV6
+	char localaddr[INET6_ADDRSTRLEN];
+#else
+#ifndef INET_ADDRSTRLEN
+#define INET_ADDRSTRLEN 16
+#endif
+	char localaddr[INET_ADDRSTRLEN];
+#endif
+
+};
+
+
