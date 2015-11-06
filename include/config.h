@@ -2,7 +2,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to enable IPv6 */
-#define ENABLE_IPV6 /**/
+//#define ENABLE_IPV6 /**/
 
 /* Define to 1 if you have the <arpa/nameser_compat.h> header file. */
 #define HAVE_ARPA_NAMESER_COMPAT_H 1

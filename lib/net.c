@@ -243,9 +243,11 @@ void net_send_tcp(struct nettask *t, int index)
 	struct sockaddr_storage local;
 	struct sockaddr_storage remote;
 	struct sockaddr_in *local4 = (struct sockaddr_in *) &local;
-	struct sockaddr_in6 *local6 = (struct sockaddr_in6 *) &local;
 	struct sockaddr_in *remote4 = (struct sockaddr_in *) &remote;
+#ifdef ENABLE_IPV6
+	struct sockaddr_in6 *local6 = (struct sockaddr_in6 *) &local;
 	struct sockaddr_in6 *remote6 = (struct sockaddr_in6 *) &remote;
+#endif
 	socklen_t len;
 
 	ttl = index + 1;
@@ -360,9 +362,11 @@ void net_send_sctp(struct nettask *t, int index)
 	struct sockaddr_storage local;
 	struct sockaddr_storage remote;
 	struct sockaddr_in *local4 = (struct sockaddr_in *) &local;
-	struct sockaddr_in6 *local6 = (struct sockaddr_in6 *) &local;
 	struct sockaddr_in *remote4 = (struct sockaddr_in *) &remote;
+#ifdef ENABLE_IPV6
+	struct sockaddr_in6 *local6 = (struct sockaddr_in6 *) &local;
 	struct sockaddr_in6 *remote6 = (struct sockaddr_in6 *) &remote;
+#endif
 	socklen_t len;
 
 	ttl = index + 1;
@@ -1337,9 +1341,9 @@ int net_open(struct nettask *t, struct hostent * host)
 			exit( EXIT_FAILURE );
 	}
 
-	len = sizeof name_struct; 
+	len = sizeof name_struct;
 	getsockname (t->recvsock, name, &len);
-	sockaddrtop( name, t->localaddr, sizeof t->localaddr );
+	sockaddrtop( name, t->localaddr, sizeof(t->localaddr));
 	printf ("got localaddr: %s\n", t->localaddr); 
 
 	return 0;

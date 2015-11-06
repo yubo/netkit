@@ -1,6 +1,7 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 #include <stdint.h>
+#include "config.h"
 #include "utils.h"
 
 typedef uint8_t uint8;
@@ -32,4 +33,13 @@ typedef int socklen_t;
 #endif
 
 char * trim(char * s);
+
+#ifdef NO_HERROR
+#define herror(str) fprintf(stderr, str ": error looking up \"%s\"\n", Hostname);
+#endif
+
+struct nettask;
+void init_fld_options(void);
+void report(struct nettask *t, char *LocalHostname);
+
 #endif

@@ -7,7 +7,7 @@ ADD_DEFINITIONS(-D_GNU_SOURCE)
 
 ADD_DEFINITIONS(-I. -I./include -I${CMAKE_SOURCE_DIR}/include
 	-I${CMAKE_SOURCE_DIR}/lib/include
-	-g -O2 -Wall -Wno-pointer-sign -Wno-unused-result)
+	-g -O0 -Wall -Wno-pointer-sign -Wno-unused-result)
 
 add_subdirectory(lib)
-add_subdirectory(test)
+#add_subdirectory(test)

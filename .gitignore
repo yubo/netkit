@@ -12,3 +12,5 @@ Makefile
 *.o
 tmp/
 test.c
+test
+mtr

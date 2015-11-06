@@ -30,8 +30,6 @@
 
 #include "utils.h"
 
-struct nettask;
-
 struct nettask *net_init(int fstTTL, int maxTTL,
 		int cpacketsize, int bitpattern, int tos, int af,
 		int mtrtype, int remoteport, int tcp_timeout, int mark);
@@ -123,13 +121,8 @@ struct fields {
   int (*net_xxx)();
 };
 
-extern struct fields data_fields[MAXFLD];
-
 
 /* keys: the value in the array is the index number in data_fields[] */
-extern int fld_index[];
-extern unsigned char fld_active[];
-extern char available_options[];
 
 ip_t unspec_addr;
 

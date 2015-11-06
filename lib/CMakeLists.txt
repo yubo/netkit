@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-ADD_LIBRARY(mtr SHARED net.c dns.c utils.c)
+ADD_LIBRARY(mtr SHARED net.c dns.c utils.c select.c)
 
-#ADD_EXECUTABLE(main main.c)
-#TARGET_LINK_LIBRARIES(main mtr m resolv)
-#SET_TARGET_PROPERTIES(main PROPERTIES OUTPUT_NAME mtr)
+ADD_EXECUTABLE(test test.c)
+TARGET_LINK_LIBRARIES(test mtr m resolv)
+#SET_TARGET_PROPERTIES(test PROPERTIES OUTPUT_NAME mtr)
