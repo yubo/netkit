@@ -44,7 +44,6 @@ static char *strlongip(struct nettask *t, ip_t * ip)
 
   return (char *) inet_ntop(t->af, ip, addrstr, sizeof addrstr );
 #else
-  printf("------ip:0x%08x\n", ip->s_addr);
   return inet_ntoa( *ip );
 #endif
 }
@@ -117,7 +116,6 @@ void report(struct nettask *t, char *LocalHostname)
 	for(; at < max; at++) {
 		addr = net_addr(t, at);
 		mpls = net_mpls(t, at);
-		printf("----ip:0x%08x\n", addr->s_addr);
 		snprint_addr(t, name, sizeof(name), addr);
 
 		snprintf( fmt, sizeof(fmt), " %%2d.|-- %%-%ds", len_hosts);

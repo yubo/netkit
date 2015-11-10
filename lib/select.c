@@ -32,7 +32,6 @@
 #include "utils.h"
 #include "net.h"
 /*
-extern int Interactive;
 extern int MaxPing;
 extern int ForceMaxPing;
 extern float WaitTime;
@@ -44,7 +43,7 @@ static struct timeval intervaltime;
 
 #define GRACETIME (5 * 1000*1000)
 
-void select_loop(struct nettask *t, int Interactive, int MaxPing,
+void select_loop(struct nettask *t, int MaxPing,
 		int ForceMaxPing, float WaitTime, int mtrtype) {
 	fd_set readfd;
 	fd_set writefd;
@@ -52,7 +51,6 @@ void select_loop(struct nettask *t, int Interactive, int MaxPing,
 	int maxfd = 0;
 	int netfd;
 	int NumPing = 0;
-	int paused = 0;
 	struct timeval lasttime, thistime, selecttime;
 	struct timeval startgrace;
 	int dt;
@@ -73,11 +71,6 @@ void select_loop(struct nettask *t, int Interactive, int MaxPing,
 
 		maxfd = 0;
 
-		if(Interactive) {
-			FD_SET(0, &readfd);
-			maxfd = 1;
-		}
-
 		netfd = net_waitfd(t);
 		FD_SET(netfd, &readfd);
 		if(netfd >= maxfd) maxfd = netfd + 1;
@@ -86,19 +79,18 @@ void select_loop(struct nettask *t, int Interactive, int MaxPing,
 			net_add_fds(t, &writefd, &maxfd);
 
 		do {
-			if(anyset || paused) {
+			if(anyset) {
 				/* Set timeout to 0.1s.
 				 * While this is almost instantaneous for human operators,
 				 * it's slow enough for computers to go do something else;
 				 * this prevents mtr from hogging 100% CPU time on one core.
 				 */
 				selecttime.tv_sec = 0;
-				selecttime.tv_usec = paused?100000:0; 
+				selecttime.tv_usec = 0; 
 
 				rv = select(maxfd, (void *)&readfd, &writefd, NULL, &selecttime);
 
 			} else {
-				//if(Interactive) display_redraw();
 
 				gettimeofday(&thistime, NULL);
 
@@ -108,7 +100,7 @@ void select_loop(struct nettask *t, int Interactive, int MaxPing,
 					lasttime = thistime;
 
 					if (!graceperiod) {
-						if (NumPing >= MaxPing && (!Interactive || ForceMaxPing)) {
+						if (NumPing >= MaxPing) {
 							graceperiod = 1;
 							startgrace = thistime;
 						}

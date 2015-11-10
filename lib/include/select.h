@@ -16,5 +16,5 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-void select_loop(struct nettask *t, int Interactive, int MaxPing,
+void select_loop(struct nettask *t, int MaxPing,
 		int ForceMaxPing, float WaitTime, int mtrtype);
